@@ -31,16 +31,19 @@ int main(int argc, char **argv){
 		 png = 1;
     } else if (strcmp("-p", argv[1]) == 0){
          png = 1;
+	 gif = 0;
     } else if (strcmp("-sg", argv[1]) == 0){
          gif = 2;
 		 png = 2;
     } else if (strcmp("-sp", argv[1]) == 0){
          png = 2;
+	 gif = 0;
     } else if (strcmp("-lg", argv[1]) == 0){
          gif = 3;
 		 png = 3;
     } else if (strcmp("-lp", argv[1]) == 0){
          png = 3;
+	 gif = 0;
     }
 	
 	if (argc > 3){
