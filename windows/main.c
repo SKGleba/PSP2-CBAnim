@@ -22,7 +22,7 @@ int main(int argc, char **argv){
 	int png = -1, gif = -1;
 	FILE *fp;
 	if(argc < 3){
-		printf("\nusage: cbanim -intype filename%%d [optional flags]\n intypes:\n  -r: raw\n  -p: png/jpg/any supported static image format\n  -g: gif\n Note: you can add a \"s\" to resize to 960x544 or \"l\" to resize to 960x128.\n\n optional flags:\n  -noloop: show the animation one time\n  -nocompress: disable compression (slow, not recommended)\n  -nopreload: dont load to RAM first (directly read from the *.img)\n  -slowmode: make it slower, but stable (no artifacts)\n\n  ex1: cbanim -p frame_%%d.png -noloop => add PNGs to the bootanimation starting from frame_0.png, set to run-once mode\n  ex2: cbanim -sg anim.gif => resize and convert the anim.gif GIF to the bootanimation, the animation will loop\n\n");
+		printf("\nusage: cbanim -intype filename%%d -optional flags-\n intypes:\n  -r: raw\n  -p: png/jpg/any supported static image format\n  -g: gif\n  -i: static OUTPUT image\n Note: you can add a \"s\" to resize to 960x544 or \"l\" to resize to 960x128.\noptional flags:\n -noloop: show the animation one time\n -nocompress: disable compression (slow, not recommended)\n -nopreload: dont load to RAM first (directly read from the *.img)\n -slowmode: make it slower, but stable (no artifacts)\n\n ex1: cbanim -p frame_%%d.png -noloop => add PNGs to the bootanimation starting from frame_0.png, set it to run-once mode\n  ex2: cbanim -sg anim.gif => resize and convert the anim.gif GIF to the bootanimation, the animation will loop until vita boots\n\n");
 		return -1;
 	}
 	
@@ -41,7 +41,12 @@ int main(int argc, char **argv){
 		 png = 3;
     } else if (strcmp("-lp", argv[1]) == 0){
          png = 3;
-    }
+    } else if (strcmp("-i", argv[1]) == 0) {
+		 png = 4;
+    } else if (strcmp("-si", argv[1]) == 0){
+         png = 4;
+		 gif = 4;
+    } 
 	
 	if (argc > 3){
 		int i = argc - 1;
@@ -60,9 +65,42 @@ int main(int argc, char **argv){
 		}
     }
 	
-	if (gif == -1 || png == -1) {
-		printf("\nusage: cbanim -intype filename%%d -optional flags-\n intypes:\n  -r: raw\n  -p: png/jpg/any supported static image format\n  -g: gif\n Note: you can add a \"s\" to resize to 960x544 or \"l\" to resize to 960x128.\noptional flags:\n -noloop: show the animation one time\n -nocompress: disable compression (slow, not recommended)\n -nopreload: dont load to RAM first (directly read from the *.img)\n -slowmode: make it slower, but stable (no artifacts)\n\n ex1: cbanim -p frame_%%d.png -noloop => add PNGs to the bootanimation starting from frame_0.png, set it to run-once mode\n  ex2: cbanim -sg anim.gif => resize and convert the anim.gif GIF to the bootanimation, the animation will loop until vita boots\n\n");
+	if (png == -1) {
+		printf("\nusage: cbanim -intype filename%%d -optional flags-\n intypes:\n  -r: raw\n  -p: png/jpg/any supported static image format\n  -g: gif\n  -i: static OUTPUT image\n Note: you can add a \"s\" to resize to 960x544 or \"l\" to resize to 960x128.\noptional flags:\n -noloop: show the animation one time\n -nocompress: disable compression (slow, not recommended)\n -nopreload: dont load to RAM first (directly read from the *.img)\n -slowmode: make it slower, but stable (no artifacts)\n\n ex1: cbanim -p frame_%%d.png -noloop => add PNGs to the bootanimation starting from frame_0.png, set it to run-once mode\n  ex2: cbanim -sg anim.gif => resize and convert the anim.gif GIF to the bootanimation, the animation will loop until vita boots\n\n");
 		return -1;
+	}
+	
+	if (png == 4) {
+		printf("creating static image...\n");
+		sprintf(cbuff, argv[2], 0);
+		fp = fopen(cbuff, "rb");
+		if (fp == NULL)
+			return 0;
+		fclose(fp);
+		printf("converting...\n");
+		if (gif == 4) {
+			sprintf(syscmdg, "convert %s -resize 960x544! temp.rgba", cbuff);
+			system(syscmdg);
+		} else {
+			sprintf(syscmdg, "convert %s temp.rgba", cbuff);
+			system(syscmdg);
+		}
+		if (compress == 1) {
+			printf("compressing...\n");
+			system("gzip -9 -k temp.rgba");
+			printf("creating output file [boot_splash.img]\n");
+			system("type temp.rgba.gz >> boot_splash.img");
+			printf("done...\n");
+			unlink("temp.rgba");
+			unlink("temp.rgba.gz");
+		} else {
+			printf("creating output file [boot_splash.img]\n");
+			system("type temp.rgba >> boot_splash.img");
+			printf("done...\n");
+			unlink("temp.rgba");
+		}
+		
+		return 1;
 	}
 	
 	if (gif > 0) {
