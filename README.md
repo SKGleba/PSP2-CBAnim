@@ -1,5 +1,8 @@
 # PSP2-CBAnim
-BootAnimation creator for enso_ex and CBS-Manager
+BootAnimation creator for enso_ex v3.X and CBS-Manager
+
+# THIS TOOL IS OUTDATED, PLEASE USE https://github.com/SKGleba/VitaTools#vita-bootanim INSTEAD
+
 # Usage
 "cbanim -intype filename%d [optional flags]"
  - intype: input file type [ -r: raw | -g: gif | -p: png/jpg | -i: STATIC output]. Note: there is also a resize parameter "s" (screen res) or "l" (lanimation), it can be used with -g/-p/-i (-sg/-sp/-si), if set, cbanim will resize the input data to 960x544 or 960x128 (the file remains untouched).
